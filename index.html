@@ -1,0 +1,442 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Pain Point Prompt Engine</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Source+Code+Pro:wght@400;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-gradient-start: #1f2937;
+      --bg-gradient-end: #111827;
+      --card-bg: rgba(31, 41, 55, 0.5); /* Semi-transparent card background */
+      --card-border: rgba(255, 255, 255, 0.1);
+      --text-primary: #f9fafb;
+      --text-secondary: #d1d5db;
+      --text-heading: #ffffff;
+      --accent-primary: #22d3ee;
+      --accent-hover: #67e8f9;
+      --accent-success: #34d399;
+      --input-bg: #374151;
+      --code-bg: rgba(0, 0, 0, 0.3);
+      --shadow-color: rgba(0, 0, 0, 0.25);
+    }
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      background: linear-gradient(135deg, var(--bg-gradient-start), var(--bg-gradient-end));
+      color: var(--text-primary);
+      line-height: 1.6;
+      padding: 40px 20px;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+    .container {
+      max-width: 850px;
+      width: 100%;
+      margin: 0 auto;
+      flex-grow: 1;
+    }
+    header {
+      text-align: center;
+      margin-bottom: 40px;
+    }
+    h1 {
+      font-size: 2.5rem;
+      font-weight: 700;
+      color: var(--text-heading);
+      letter-spacing: -1px;
+      margin-bottom: 10px;
+    }
+    p.subtitle {
+      font-size: 1.1rem;
+      color: var(--text-secondary);
+    }
+    .input-section {
+      background-color: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 16px;
+      padding: 25px;
+      margin-bottom: 40px;
+      display: grid;
+      gap: 20px;
+    }
+    .input-group label {
+        display: block;
+        font-weight: 600;
+        color: var(--text-secondary);
+        margin-bottom: 8px;
+    }
+    .input-group textarea {
+        width: 100%;
+        background-color: var(--input-bg);
+        color: var(--text-primary);
+        border: 1px solid var(--card-border);
+        border-radius: 8px;
+        padding: 12px;
+        font-family: 'Inter', sans-serif;
+        font-size: 1rem;
+        resize: vertical;
+        min-height: 80px;
+        transition: border-color 0.3s, box-shadow 0.3s;
+    }
+    .input-group textarea:focus {
+        outline: none;
+        border-color: var(--accent-primary);
+        box-shadow: 0 0 0 3px rgba(34, 211, 238, 0.3);
+    }
+    .prompts-container {
+      display: grid;
+      gap: 30px;
+    }
+    .prompt-card {
+      background-color: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 16px;
+      box-shadow: 0 8px 32px 0 var(--shadow-color);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px); /* For Safari */
+      padding: 25px;
+      display: flex;
+      flex-direction: column;
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+    .prompt-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 12px 40px 0 var(--shadow-color);
+    }
+    .prompt-card h2 {
+      font-size: 1.75rem;
+      font-weight: 600;
+      color: var(--text-heading);
+      margin-bottom: 20px;
+      padding-bottom: 10px;
+      border-bottom: 1px solid var(--card-border);
+    }
+    .prompt-text, .homework-content {
+      background-color: var(--code-bg);
+      padding: 20px;
+      border-radius: 10px;
+      white-space: pre-wrap;
+      word-wrap: break-word;
+      font-size: 1rem;
+      color: var(--text-primary);
+      flex-grow: 1;
+      margin-bottom: 20px;
+      border: 1px solid var(--card-border);
+    }
+    .prompt-text {
+        font-family: 'Source Code Pro', "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+        font-weight: 600;
+    }
+    .homework-content {
+      font-family: 'Inter', sans-serif;
+    }
+    .homework-content a {
+        color: var(--accent-primary);
+        font-weight: 600;
+        text-decoration: none;
+    }
+    .homework-content a:hover {
+        text-decoration: underline;
+    }
+    .homework-content p {
+        margin-bottom: 15px;
+    }
+    .copy-button {
+      align-self: flex-end;
+      padding: 10px 20px;
+      font-size: 0.9rem;
+      font-weight: 600;
+      color: var(--bg-gradient-end);
+      background-color: var(--accent-primary);
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background-color 0.3s, transform 0.2s;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .copy-button:hover {
+      background-color: var(--accent-hover);
+      transform: scale(1.05);
+    }
+    .copy-button.copied {
+      background-color: var(--accent-success);
+    }
+    .copy-button .icon {
+      width: 16px;
+      height: 16px;
+    }
+    .copy-button .copied-icon {
+        display: none;
+    }
+    .copy-button.copied .copy-icon {
+        display: none;
+    }
+    .copy-button.copied .copied-icon {
+        display: inline-block;
+    }
+    .footer {
+        text-align: center;
+        margin-top: 40px;
+        padding-top: 20px;
+        border-top: 1px solid var(--card-border);
+        color: var(--text-secondary);
+        font-size: 0.9rem;
+    }
+    @media (max-width: 600px) {
+      body {
+        padding: 20px 15px;
+      }
+      h1 {
+        font-size: 2rem;
+      }
+      .prompt-card h2 {
+        font-size: 1.4rem;
+      }
+      .prompt-text, .homework-content {
+          font-size: 0.9rem;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <header>
+      <h1>Pain Point Prompt Engine</h1>
+      <p class="subtitle">Enter your details below to generate tailored marketing prompts.</p>
+    </header>
+
+    <main>
+      <section class="input-section">
+        <div class="input-group">
+          <label for="painPointInput">[Paste a Pain Point Here]</label>
+          <textarea id="painPointInput" rows="3" placeholder="e.g., I'm tired of trading my time for money and want to build a passive income stream that gives me freedom."></textarea>
+        </div>
+        <div class="input-group">
+          <label for="productNameInput">[Product Name]</label>
+          <textarea id="productNameInput" rows="2" placeholder="e.g., The Freedom Funnel Blueprint"></textarea>
+        </div>
+        <div class="input-group">
+          <label for="solutionInput">[How does it solve the targeted pain point]</label>
+          <textarea id="solutionInput" rows="4" placeholder="e.g., It provides a step-by-step video course showing how to create and launch a digital product, automate the sales process, and build an audience, allowing users to generate income without constant active work."></textarea>
+        </div>
+      </section>
+
+      <div class="prompts-container" id="promptsContainer">
+        
+        <div class="prompt-card">
+          <h2>Homework</h2>
+          <div class="homework-content">
+            <p><strong>Step 1: Create the prompt</strong></p>
+            <p>Access URL: <a href="https://actionactivated.com/prompt-engine/painpointpromptengine.html" target="_blank" rel="noopener noreferrer">https://actionactivated.com/prompt-engine/painpointpromptengine.html</a><br>e.g., finding a way to create sustainable online income</p>
+            <p><strong>Step 2: Get the list</strong></p>
+          </div>
+        </div>
+
+        <div class="prompt-card">
+          <h2>1. SP Analysis</h2>
+          <pre id="spAnalysisPrompt" class="prompt-text"></pre>
+          <button class="copy-button" data-target="spAnalysisPrompt">
+            <svg class="icon copy-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 17.25v3.375c0 .621-.504 1.125-1.125 1.125h-9.75a1.125 1.125 0 01-1.125-1.125V7.875c0-.621.504-1.125 1.125-1.125H6.75a9.06 9.06 0 011.5.124m7.5 10.376h3.375c.621 0 1.125-.504 1.125-1.125V11.25c0-4.46-3.243-8.161-7.5-8.876a9.06 9.06 0 00-1.5-.124H9.375c-.621 0-1.125.504-1.125 1.125v3.5m7.5 10.375H9.375a1.125 1.125 0 01-1.125-1.125v-9.25m12 6.625v-1.875a3.375 3.375 0 00-3.375-3.375h-1.5a1.125 1.125 0 01-1.125-1.125v-1.5a3.375 3.375 0 00-3.375-3.375H9.75" /></svg>
+            <svg class="icon copied-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5" /></svg>
+            <span class="button-text">Copy Prompt</span>
+          </button>
+        </div>
+
+        <div class="prompt-card">
+            <h2>2. Landing Page</h2>
+            <pre id="landingPagePrompt" class="prompt-text"></pre>
+            <button class="copy-button" data-target="landingPagePrompt">
+                <svg class="icon copy-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 17.25v3.375c0 .621-.504 1.125-1.125 1.125h-9.75a1.125 1.125 0 01-1.125-1.125V7.875c0-.621.504-1.125 1.125-1.125H6.75a9.06 9.06 0 011.5.124m7.5 10.376h3.375c.621 0 1.125-.504 1.125-1.125V11.25c0-4.46-3.243-8.161-7.5-8.876a9.06 9.06 0 00-1.5-.124H9.375c-.621 0-1.125.504-1.125 1.125v3.5m7.5 10.375H9.375a1.125 1.125 0 01-1.125-1.125v-9.25m12 6.625v-1.875a3.375 3.375 0 00-3.375-3.375h-1.5a1.125 1.125 0 01-1.125-1.125v-1.5a3.375 3.375 0 00-3.375-3.375H9.75" /></svg>
+                <svg class="icon copied-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5" /></svg>
+                <span class="button-text">Copy Prompt</span>
+            </button>
+        </div>
+
+        <div class="prompt-card">
+            <h2>3. Blog Post</h2>
+            <pre id="blogPostPrompt" class="prompt-text"></pre>
+            <button class="copy-button" data-target="blogPostPrompt">
+                <svg class="icon copy-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 17.25v3.375c0 .621-.504 1.125-1.125 1.125h-9.75a1.125 1.125 0 01-1.125-1.125V7.875c0-.621.504-1.125 1.125-1.125H6.75a9.06 9.06 0 011.5.124m7.5 10.376h3.375c.621 0 1.125-.504 1.125-1.125V11.25c0-4.46-3.243-8.161-7.5-8.876a9.06 9.06 0 00-1.5-.124H9.375c-.621 0-1.125.504-1.125 1.125v3.5m7.5 10.375H9.375a1.125 1.125 0 01-1.125-1.125v-9.25m12 6.625v-1.875a3.375 3.375 0 00-3.375-3.375h-1.5a1.125 1.125 0 01-1.125-1.125v-1.5a3.375 3.375 0 00-3.375-3.375H9.75" /></svg>
+                <svg class="icon copied-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5" /></svg>
+                <span class="button-text">Copy Prompt</span>
+            </button>
+        </div>
+
+        <div class="prompt-card">
+            <h2>4. Facebook Post</h2>
+            <pre id="facebookPostPrompt" class="prompt-text"></pre>
+            <button class="copy-button" data-target="facebookPostPrompt">
+                <svg class="icon copy-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 17.25v3.375c0 .621-.504 1.125-1.125 1.125h-9.75a1.125 1.125 0 01-1.125-1.125V7.875c0-.621.504-1.125 1.125-1.125H6.75a9.06 9.06 0 011.5.124m7.5 10.376h3.375c.621 0 1.125-.504 1.125-1.125V11.25c0-4.46-3.243-8.161-7.5-8.876a9.06 9.06 0 00-1.5-.124H9.375c-.621 0-1.125.504-1.125 1.125v3.5m7.5 10.375H9.375a1.125 1.125 0 01-1.125-1.125v-9.25m12 6.625v-1.875a3.375 3.375 0 00-3.375-3.375h-1.5a1.125 1.125 0 01-1.125-1.125v-1.5a3.375 3.375 0 00-3.375-3.375H9.75" /></svg>
+                <svg class="icon copied-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5" /></svg>
+                <span class="button-text">Copy Prompt</span>
+            </button>
+        </div>
+
+      </div>
+    </main>
+    <footer class="footer">
+        <p>Copyright &copy; <script>document.write(new Date().getFullYear())</script> Siva Prasad Mukherjee. All Rights Reserved.</p>
+    </footer>
+  </div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const promptsContainer = document.getElementById('promptsContainer');
+      const painPointInput = document.getElementById('painPointInput');
+      const productNameInput = document.getElementById('productNameInput');
+      const solutionInput = document.getElementById('solutionInput');
+
+      const spAnalysisOutput = document.getElementById('spAnalysisPrompt');
+      const landingPageOutput = document.getElementById('landingPagePrompt');
+      const blogPostOutput = document.getElementById('blogPostPrompt');
+      const facebookPostOutput = document.getElementById('facebookPostPrompt');
+
+      function updatePrompts() {
+        const painPoint = painPointInput.value.trim() || '[Paste a Pain Point Here]';
+        const productName = productNameInput.value.trim() || '[Product Name]';
+        const solution = solutionInput.value.trim() || '[How does it solve the targeted pain point]';
+
+        spAnalysisOutput.textContent = `Read and understand the attached HTML sales page.
+
+I want to promote this product online to those who suffer from this pain point:
+'${painPoint}'
+
+I want to promote this product online with a simple funnel that includes:
+
+1, A blog post about the product, based on the buyers’ main pain point.
+2, A landing page highlighting the same pain point.
+3, A Facebook Page post announcing the blog post and showing how it solves that pain point.
+
+I will drive traffic to the blog post through a Facebook Ad Campaign by boosting the Facebook Page post.
+
+You are a senior ethical marketing strategist. Please answer:
+
+1, What is the Product Name?
+2, What is the Keyword/Topic?
+3, What do buyers receive (e.g., video course, ebook, etc.)?
+4, How does it solves the abovesaid pain point?`;
+        
+        landingPageOutput.textContent = `You are a professional conversion copywriter and landing page strategist. 
+
+Adhering strictly to the Important Information given below and keeping in line with the original niche/keyword and based on the pain point and 'How does it solve the targeted pain point?' given below, create a high-converting landing page headline and persuasive sales copy that directly addresses the reader’s pain point. The headline should be concise, emotionally compelling, and optimized to immediately capture attention. The sales copy should flow naturally, starting with an empathetic opening that resonates with the reader’s struggles and transitions into the benefits and solutions offered. Use conversational, persuasive language that feels personal and relatable, avoiding robotic or overly formal tones. Incorporate a clear structure with a problem-agitation-solution framework, highlighting the emotional and practical benefits of taking action. End with a strong call-to-action that reinforces urgency or curiosity and motivates readers to take the next step, which is to visit the sales page of the product I am promoting through this content, at: [URL]. 
+
+Do not include testimonials or other forms of social proof. 
+
+Ensure the copy is engaging, emotionally resonant, not short, and optimized for conversions. Do not use horizontal lines in the output.
+
+Important Information:
+
+The product I want to promote: ${productName}
+The pain point I want to highlight in my contents: ${painPoint}
+
+My objective:
+I want to promote this product online with a simple funnel that includes:
+1. A blog post about the product, based on the buyers’ main pain point.
+2. A landing page highlighting the same pain point.
+3. A Facebook Page post announcing the blog post and showing how it solves that pain point.
+
+How does it solve the targeted pain point?
+
+${solution}`;
+
+        blogPostOutput.textContent = `You are a professional content strategist, expert copywriter, and creative storyteller. 
+
+Adhering strictly to the Important Information and 'How does it solve the targeted pain point?' given below. please write a 1,500-word blog post based on the pain point, given below and keeping in line with niche/keyword. Begin the post with a direct quote of the pain point, ensuring it resonates immediately with the reader’s emotions and lived experience. Use this as a jumping-off point to connect deeply with the audience, incorporating conversational language. Throughout the post, address the pain point in a deeply human, relatable way, ensuring the tone feels personal, authentic, and conversational to avoid detection as AI-generated content. Use subtle variations in sentence length, natural phrasing, and occasional colloquialisms to enhance the flow and readability. Break the content into logically connected sections that feel organic rather than formulaic, DO NOT use horizontal lines or explicit separations. Use a mix of narrative examples, questions, and thought-provoking insights to keep readers engaged. Avoid repetitive phrasing and integrate a range of rhetorical devices, such as metaphors, analogies, and rhetorical questions, to create depth and nuance. Include actionable advice or insights to guide the reader toward hope or solutions, but ensure the content feels exploratory and natural, avoiding overly polished or robotic tones. Conclude with a reflective, forward-looking statement that inspires readers to take the next step, which is visiting the Sales Page of the product at [URL], wrapping up naturally without explicitly labeling it as a conclusion. 
+
+Throughout the piece, use human-like imperfections—contradictions, emotional depth, and unique phrasing—to make the content undetectable as AI-generated.
+
+Important Information:
+
+The product I want to promote: ${productName}
+The pain point I want to highlight in my contents: ${painPoint}
+
+My objective:
+I want to promote this product online with a simple funnel that includes:
+1. A blog post about the product, based on the buyers’ main pain point.
+2. A landing page highlighting the same pain point.
+3. A Facebook Page post announcing the blog post and showing how it solves that pain point.
+
+How does it solve the targeted pain point?
+
+${solution}`;
+
+        facebookPostOutput.textContent = `You are a professional social media strategist, content creator, and visual storytelling expert. 
+
+Adhering strictly to the Important Information given below and keeping in line with the original niche/keyword and based on the pain point and 'How does it solve the targeted pain point?' given below, create an engaging Facebook posts that start with a direct quote from the pain point to immediately capture attention. 
+
+This post should be concise, emotionally resonant, and tailored to encourage interaction or drive clicks. 
+
+Ensure the tone aligns with the pain point content, using conversational, empathetic language that feels personal and relatable. 
+
+Include a strong thought-provoking question at the end to foster engagement and also a strong call-to-action to read the blog post you gave me in your last reply at: [URL]
+
+Also for the post, suggest a detailed AI image generation prompt for an ultra-realistic, visually stunning image optimized to grab attention on social media. The visuals should avoid excessive text within the images and instead rely on striking imagery, evocative elements, and clear focal points to convey the message. 
+
+Ensure the image prompt focus on emotion, context, and eye-catching aesthetics that directly complement the pain point. Do not use horizontal lines in the output.
+
+Important Information:
+
+The product I want to promote: ${productName}
+The pain point I want to highlight in my contents: ${painPoint}
+
+My objective:
+I want to promote this product online with a simple funnel that includes:
+1. A blog post about the product, based on the buyers’ main pain point.
+2. A landing page highlighting the same pain point.
+3. A Facebook Page post announcing the blog post and showing how it solves that pain point.
+
+How does it solve the targeted pain point?
+
+${solution}`;
+
+      }
+
+      // Add event listeners to update prompts on input
+      [painPointInput, productNameInput, solutionInput].forEach(input => {
+        input.addEventListener('input', updatePrompts);
+      });
+
+      // Initial call to populate prompts
+      updatePrompts();
+
+      // Event delegation for the copy buttons
+      document.body.addEventListener('click', (event) => {
+        const button = event.target.closest('.copy-button');
+        if (!button) return;
+
+        const targetId = button.dataset.target;
+        const textToCopy = document.getElementById(targetId).textContent;
+        const buttonTextEl = button.querySelector('.button-text');
+
+        navigator.clipboard.writeText(textToCopy).then(() => {
+          const originalText = buttonTextEl.textContent;
+          buttonTextEl.textContent = 'Copied!';
+          button.classList.add('copied');
+          
+          setTimeout(() => {
+            buttonTextEl.textContent = originalText;
+            button.classList.remove('copied');
+          }, 2000);
+        }).catch(err => {
+          console.error('Failed to copy text: ', err);
+          alert('Failed to copy text. Please try again.');
+        });
+      });
+    });
+  </script>
+
+</body>
+</html>
+
