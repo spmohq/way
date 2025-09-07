@@ -219,8 +219,8 @@
       <div class="generator-container">
         <div class="input-card">
           <div class="input-group">
-            <label for="mobileNumber">Mobile Number (without country code)</label>
-            <input type="tel" id="mobileNumber" placeholder="e.g., 9876543210" maxlength="10">
+            <label for="mobileNumber">Mobile Number (India, +91)</label>
+            <input type="tel" id="mobileNumber" placeholder="e.g., 98765 43210" inputmode="numeric" pattern="[0-9]*">
           </div>
         </div>
 
@@ -256,10 +256,21 @@
       const placeholderText = 'Your link will appear here...';
 
       mobileInput.addEventListener('input', () => {
-        const mobileNumber = mobileInput.value.trim().replace(/\D/g, ''); // Remove non-digits
+        // 1. Get current value and remove all non-digit characters.
+        let cleanedNumber = mobileInput.value.replace(/\D/g, '');
         
-        if (mobileNumber.length > 0) {
-          const generatedUrl = `https://wa.me/91${mobileNumber}`;
+        // 2. Truncate to a maximum of 10 digits.
+        if (cleanedNumber.length > 10) {
+          cleanedNumber = cleanedNumber.substring(0, 10);
+        }
+        
+        // 3. Update the input field's value to show the cleaned number.
+        // This provides instant feedback to the user.
+        mobileInput.value = cleanedNumber;
+        
+        // 4. Check if the number is exactly 10 digits long to generate the link.
+        if (cleanedNumber.length === 10) {
+          const generatedUrl = `https://wa.me/91${cleanedNumber}`;
           linkDisplay.textContent = generatedUrl;
           
           copyBtn.disabled = false;
@@ -267,6 +278,7 @@
           openLinkBtn.href = generatedUrl;
 
         } else {
+          // If not 10 digits, reset to the initial state.
           linkDisplay.textContent = placeholderText;
           copyBtn.disabled = true;
           openLinkBtn.classList.add('disabled');
